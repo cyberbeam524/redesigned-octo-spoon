@@ -60,6 +60,11 @@ public class Stock {
     return this.price;
   }
 
+  public void setPrice(double price){
+
+    this.price = price;
+  }
+
   public Double getQty(){
     return this.qty;
   }

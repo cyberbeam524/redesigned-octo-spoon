@@ -2,13 +2,6 @@ package ta_java.controllers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-// public class Calculator {
-    
-// }
-
-// package ta_java.controllers;
-
 import java.util.List;
 
 import org.springframework.http.HttpStatus;

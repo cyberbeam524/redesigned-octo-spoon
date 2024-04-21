@@ -3,9 +3,6 @@
 //  */
 package ta_java;
 
-import ta_java.controllers.Employeecontroller;
-import ta_java.listeners.EmployeeEventsListener;
-
 // import java.io.BufferedReader;
 // import java.io.File;
 // import java.io.FileReader;
@@ -64,10 +61,8 @@ import ta_java.listeners.EmployeeEventsListener;
 
 // package com.howtodoinjava.demo;
 
-import ta_java.model.Employee;
 import ta_java.model.Option;
 import ta_java.model.Stock;
-import ta_java.service.EmployeeService;
 import ta_java.service.OptionService;
 import ta_java.service.StockService;
 import lombok.extern.slf4j.Slf4j;
@@ -98,6 +93,8 @@ import java.io.IOException;
 
 import static java.lang.Math.exp;
 
+import java.util.stream.Collectors;
+
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 @EnableScheduling
@@ -109,14 +106,7 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 public class App implements CommandLineRunner {
   public static void main(String[] args) {
     SpringApplication.run(App.class);
-    // SpringApplication springApplication = 
-    //     new SpringApplication(App.class);
-    // springApplication.addListeners(new EmployeeEventsListener());
-    // springApplication.run(args);
   }
-
-  @Autowired
-  EmployeeService employeeService;
 
   @Autowired
   StockService stockService;
@@ -124,8 +114,6 @@ public class App implements CommandLineRunner {
   @Autowired
   OptionService optionService;
 
-  // @Autowired
-  // Employeecontroller controller;
 
   // creating a logger 
   Logger logger = LoggerFactory.getLogger(App.class); 
@@ -153,23 +141,7 @@ public class App implements CommandLineRunner {
   @Override
   public void run(String... args) throws Exception {
 
-
-//     File folder = new File("../assets");
-// File[] listOfFiles = folder.listFiles();
-
-// for (int i = 0; i < listOfFiles.length; i++) {
-//   if (listOfFiles[i].isFile()) {
-//     System.out.println("File " + listOfFiles[i].getName());
-//     List<List<String>> records = new App().readCsvFile(listOfFiles[i]);
-
-
-
-//   } else if (listOfFiles[i].isDirectory()) {
-//     System.out.println("Directory " + listOfFiles[i].getName());
-//   }
-// }
-
-File file = new File("../assets/books.csv");
+File file = new File("../assets/stocks.csv");
 System.out.println("File " + file.getName());
 List<List<String>> records = new App().readCsvFile(file);
 System.out.println("records:  " + file.getName());
@@ -230,41 +202,43 @@ for (List<String> record: records){
   double sigma = 0.1;
   double randInt = 0.0;
   Random one = new Random();
+  // get price of each stock from database and save as initial price for new brownian motion calculation:
   double initialPriceS = 2000;
 
-  double getLatestBrownianPrice2(){
-      LocalTime myObj = LocalTime.now();
-      System.out.println(myObj);
+  double getLatestBrownianPrice2(double initialPrice){
       randInt = one.nextGaussian();
-      double newPrice = initialPriceS * (1 + (mu * (timeDiffSec/7257600) + sigma * randInt * Math.sqrt(timeDiffSec/7257600)));
-      System.out.println(newPrice);
-      initialPriceS = newPrice;
-      return initialPriceS;
+      double newPrice = initialPrice * (1 + (mu * (timeDiffSec/7257600) + sigma * randInt * Math.sqrt(timeDiffSec/7257600)));
+      // System.out.println(newPrice);
+      initialPrice = newPrice;
+      return initialPrice;
   }
 
 
   @Scheduled(fixedRate = 2000L)
   public void sendMessage() throws Exception{
+    LocalTime myObj = LocalTime.now();
+      // System.out.println(myObj);
     System.out.println("Market Update...");
-    double price = getLatestBrownianPrice2();
-    // employeeService.create(new Employee(price));
+    double price = getLatestBrownianPrice2(initialPriceS);
+    List<Stock> stocks = stockService.getAccounts();
+    for (Stock s: stocks){
+      System.out.println("ssss:" + s.toString());
+    }
+
+    List<Double> newPrices = stocks.stream().map(x -> getLatestBrownianPrice2(x.getPrice())).collect(Collectors.toList());
+    System.out.println("tttt:" + newPrices.toString());
+    
+    List<Stock> newUpdatedStocks = new ArrayList<>();
+    for (int i = 0; i < stocks.size(); i++) {
+      Stock sUpdated = stocks.get(i);
+      sUpdated.setPrice(newPrices.get(i));
+      newUpdatedStocks.add(sUpdated);
+    }
+
+    stockService.updateMultiple(newUpdatedStocks);
+    // for each of the stocks in books.csv publish a new price (and add randomised controls on whether there are updates for stock:)
+    
     
   }
 
-  // @GetMapping("/2")
-  // public String getRealTimeOptionPrice() {
-
-  //   double S = 2000;
-  //   double K = 2000;
-  //   double r = 0.02;
-  //   double sigma_volatility = 0.02;
-  //   double t = 2;
-  //   NormalDistribution normdist = new NormalDistribution();
-  //   double N = normdist.cumulativeProbability(0.02);
-  //   double d1 = (java.lang.Math.log(S/K) + (r + (sigma_volatility * sigma_volatility / 2)) * t) / (sigma_volatility * Math.sqrt(t));
-  //   double d2 = d1 - (sigma * Math.sqrt(t));
-  //   double c = S * normdist.cumulativeProbability(d1) - K * Math.exp(-r * t) *normdist.cumulativeProbability(d2);
-  //   double p = K * Math.exp(-r * t) * normdist.cumulativeProbability(-d2) - S * normdist.cumulativeProbability(-d1);
-  //   return "Yay";
-  // }
 }
