@@ -12,29 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
-import ta_java.model.Employee;
-import ta_java.service.EmployeeService;
+import ta_java.model.Stock;
+import ta_java.service.StockService;
 
 @RestController
 @RequestMapping(value = "/calculate")
 public class Calculator {
 
-    // private final EmployeeService accountQueryService;
-
-    public Calculator() {
-        // this.accountQueryService = accountQueryService;
-    }
-
-    // @GetMapping("/{accountId}")
-    // public ResponseEntity<Employee> getAccountById(@PathVariable(value = "accountId") Long accountId) {
-    //     Optional<Account> accountOpt = accountQueryService.getAccountById(accountId);
-    //     return accountOpt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    // }
+    public Calculator() { }
 
     @GetMapping("/list")
     public HashMap<String, Double> getAccounts() {
-        // System.out.println("returning getAccounts" + accountQueryService.getAccounts());
-
     double S = 2000;
     double K = 2000;
     double r = 0.02;

@@ -4,17 +4,20 @@ import ta_java.dao.StockRepository;
 import ta_java.events.stockManagement.UpdateStockEvent;
 import ta_java.events.stockManagement.PrintStockEvent;
 import ta_java.exception.ApplicationException;
+import ta_java.exception.DatabaseException;
 import ta_java.model.Stock;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
+  /**
+ * This Service allows saving and updating of Stock records in database
+ */
 @Service
 public class StockService implements ApplicationEventPublisherAware {
 
@@ -31,33 +34,51 @@ public class StockService implements ApplicationEventPublisherAware {
     this.repository = repository;
   }
 
+  /**
+ * This method all the stock records from database
+ */
   public List<Stock> getAccounts() {
     return repository.findAll();
 }
 
-  public Stock create(Stock stock) throws ApplicationException {
+/**
+ * @param stock Stock instance to be created in database
+ * @return saved Stock result in database
+ * @throws DatabaseException
+ */
+  public Stock create(Stock stock) throws DatabaseException {
     Stock newStock = repository.save(stock);
     if (newStock != null) {
       return newStock;
     }
-    throw new ApplicationException("newStock could not be saved");
+    throw new DatabaseException("newStock could not be saved");
   }
 
   // todo: stock service on update publish message for update stock event
-  public Stock update(Stock stock) throws ApplicationException {
+  /**
+ * @param stock Stock instance to be updated in database
+ * @return saved Stock result in database
+ * @throws DatabaseException
+ */
+  public Stock update(Stock stock) throws DatabaseException {
     Stock newStockRecord = repository.save(stock);
     if (newStockRecord != null) {
       return newStockRecord;
     }
-    throw new ApplicationException("stock could not be updated");
+    throw new DatabaseException("stock could not be updated");
   }
 
     // todo: stock service on update publish message for update stock event
-  public List<Stock> updateMultiple(List<Stock> stocks) throws ApplicationException {
+  /**
+ * @param stocks Stock instances to be updated in database and published UpdateStockEvent that triggers recalculation of portfolio.
+ * @return saved Stock results in database
+ * @throws DatabaseException
+ */
+  public List<Stock> updateMultiple(List<Stock> stocks) throws DatabaseException {
     List<Stock> stocksUpdated = new ArrayList<>();
     for (Stock s: stocks){
       Stock newStockRecord = repository.save(s);
-      if (newStockRecord == null) throw new ApplicationException("stocks could not be updated");
+      if (newStockRecord == null) throw new DatabaseException("stocks could not be updated");
       else stocksUpdated.add(newStockRecord);
     }
     applicationEventPublisher.publishEvent(new UpdateStockEvent(stocksUpdated));

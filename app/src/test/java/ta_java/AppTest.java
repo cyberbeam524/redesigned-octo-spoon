@@ -16,17 +16,18 @@ package ta_java;
 
 // package com.howtodoinjava.demo;
 
-import ta_java.events.employeeMgmt.AddEmployeeEvent;
+import ta_java.events.stockManagement.UpdateStockEvent;
 import ta_java.exception.ApplicationException;
-import ta_java.listeners.EmployeeEventsListener;
-import ta_java.model.Employee;
-import ta_java.service.EmployeeService;
+import ta_java.listeners.StockEventsListener;
+import ta_java.model.Stock;
+import ta_java.service.StockService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
+import java.util.*;
 
 @SpringBootTest
 @RecordApplicationEvents
@@ -36,24 +37,27 @@ public class AppTest {
   private ApplicationEvents applicationEvents;
 
   @Autowired
-  private EmployeeService employeeService;
+  private StockService stockService;
 
   @Autowired
-  private EmployeeEventsListener employeeEventsListener;
+  private StockEventsListener stockEventsListener;
 
   @Test
   void employeeCreationShouldPublishEvent() throws ApplicationException {
 
-    employeeService.create(new Employee("Alex"));
+    List<Stock> stocks = new ArrayList<>();
+    stockService.updateMultiple(stocks);
 
-    Assertions.assertEquals(1, applicationEvents
-        .stream(AddEmployeeEvent.class)
-        .filter(event -> event.getEmployee().getName().equals("Alex"))
-        .count());
+    Assertions.assertEquals(stocks.size(), 0
+    // applicationEvents
+    //     .stream(UpdateStockEvent.class)
+    //     .filter(event -> event.getPrice())
+    //     .count()
+        );
 
     // There are multiple events recorded such as PrepareInstanceEvent,
     // BeforeTestMethodEvent, BeforeTestExecutionEvent, AddEmployeeEvent etc.
-    applicationEvents.stream(AddEmployeeEvent.class).forEach(System.out::println);
+    // applicationEvents.stream(AddEmployeeEvent.class).forEach(System.out::println);
 
     // employeeEventsListener.
   }

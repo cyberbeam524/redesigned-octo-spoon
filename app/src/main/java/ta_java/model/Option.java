@@ -17,6 +17,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
+
+
+/**
+ * Option class that has a many to one relationship with each Stock
+ */
 // @Entity
 // @Data
 // @NoArgsConstructor

@@ -1,6 +1,5 @@
 package ta_java.dao;
 
-import ta_java.model.Employee;
 import ta_java.model.Stock;
 
 import org.springframework.data.jpa.repository.JpaRepository;

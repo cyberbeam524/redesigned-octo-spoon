@@ -65,6 +65,9 @@ import ta_java.model.Option;
 import ta_java.model.Stock;
 import ta_java.service.OptionService;
 import ta_java.service.StockService;
+import ta_java.exception.ApplicationException;
+import ta_java.exception.DatabaseException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -97,12 +100,17 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 
+
 @EnableScheduling
 @Slf4j
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
 @SpringBootApplication
+
+/**
+ * This is the main App class that runs the whole app.
+ */
 public class App implements CommandLineRunner {
   public static void main(String[] args) {
     SpringApplication.run(App.class);
@@ -119,6 +127,13 @@ public class App implements CommandLineRunner {
   Logger logger = LoggerFactory.getLogger(App.class); 
   // logger
 
+    /**
+ * This method returns the sum of two integers.
+ *
+ * @param file CSV File with tickers and their price and quantity
+ * @return the records read from the CSV file delimited by lines
+ * @throws java.io.IOException
+ */
   public List<List<String>> readCsvFile(File file) throws IOException {
     List<List<String>> records = new ArrayList<>();
     boolean first = true;
@@ -133,79 +148,86 @@ public class App implements CommandLineRunner {
             records.add(Arrays.asList(values));
         }
     }
-
-    // System.out.println(records);
     return records;
 }
 
-  @Override
-  public void run(String... args) throws Exception {
-
-File file = new File("../assets/stocks.csv");
-System.out.println("File " + file.getName());
-List<List<String>> records = new App().readCsvFile(file);
-System.out.println("records:  " + file.getName());
-for (List<String> record: records){
-  // System.out.println(record);
-  Stock s1 = stockService.create(new Stock(record.get(0), Double.parseDouble(record.get(2)), Double.parseDouble(record.get(1)), 0.02));
-  System.out.println(s1);
-}
+    /**
+ * This method creates stock and associated call and put options. It prints stock, their associated options and calculated real time value as denoted by European Option Pricing Formula.
+ *
+ * @param stockService uses StockService to create Stock records in database
+ * @param optionService uses OptionService to create Option records in database and links them to associated stocks
+ */
+  public void createCallPutOptions(StockService stockService, OptionService optionService) throws DatabaseException{
     // readfile and create objects:
     Stock s = stockService.create(new Stock("AAPL", 200, 200, 0.02));
-    // stockService.getAccounts()
     System.out.println(s);
     Option callOption1 = optionService.create(new Option(50, 5, 30, s, true));
     Option putOption1 = optionService.create(new Option(50, 5, 30, s, false));
 
-    
-    // https://stackoverflow.com/questions/10675768/executing-script-file-in-h2-database
+    System.out.println("For stock:" + s);
+    System.out.println("For call option:" + callOption1);
+    System.out.println("Real time value of call option: " + Double.toString(callOption1.getRealTimeValue()));
+    System.out.println("For put option:" + putOption1);
+    System.out.println("Real time value of put option: " + Double.toString(putOption1.getRealTimeValue()));
 
-    // System.out.println("For stock:" + s);
-    // System.out.println("For call option:" + callOption1);
-    // System.out.println("Real time value of call option: " + Double.toString(callOption1.getRealTimeValue()));
-    // System.out.println("For put option:" + putOption1);
-    // System.out.println("Real time value of put option: " + Double.toString(putOption1.getRealTimeValue()));
+  }
 
+    /**
+ * This method reads file and add all associated stocks and call options to database using services.
+ * @throws DatabaseException IOException
+  */
+  @Override
+  public void run(String... args) throws DatabaseException, IOException {
+    File file = new File("../assets/stocks.csv");
+    System.out.println("File " + file.getName());
+    List<List<String>> records = new App().readCsvFile(file);
+    System.out.println("records:  " + file.getName());
+    for (List<String> record: records){
+      Stock s1 = stockService.create(new Stock(record.get(0), Double.parseDouble(record.get(2)), Double.parseDouble(record.get(1)), 0.02));
+    }
+    createCallPutOptions(stockService, optionService);
     // precalculate all the prices for that day here orrrr: fix the start price and calculate all other future prices with diffenet time on scheduled message
   }
 
-  // https://www.javacodegeeks.com/2015/12/geometric-brownian-motion-java.html
-  // https://github.com/ylyhlh/Financial-Computing-Homeworks/blob/master/hw2_hl1283/StockPath/BrownianStockPath.java
-  // https://www.bezkoder.com/spring-boot-jpa-h2-example/#google_vignette
-  // runs every 3 seconds:
 
-  public List<double[]> getLatestBrownianPrice(double mu, double sigma, int years, int initialValue,
-  int monthlyValue, double[] breaks){
-      double periodizedMu = mu / 12;
-      double periodizedSigma = sigma / Math.sqrt(12);
-      int periods = years * 12;
+  // public List<double[]> getLatestBrownianPrice(double mu, double sigma, int years, int initialValue,
+  // int monthlyValue, double[] breaks){
 
-      List<double[]> result = new ArrayList<double[]>();
+
+  //     double periodizedMu = mu / 12;
+  //     double periodizedSigma = sigma / Math.sqrt(12);
+  //     int periods = years * 12;
+
+  //     List<double[]> result = new ArrayList<double[]>();
  
-      for (int i = 0; i < periods; i++) {
-          double value = initialValue + (monthlyValue * i);
-          NormalDistribution normalDistribution = new NormalDistribution(periodizedMu * (i + 1),
-                  periodizedSigma * sqrt(i + 1));
-          double bounds[] = new double[breaks.length];
-          for (int j = 0; j < breaks.length; j++) {
-              double normInv = normalDistribution.inverseCumulativeProbability(breaks[j]);
-              bounds[j] = value * exp(normInv);
-          }
+  //     for (int i = 0; i < periods; i++) {
+  //         double value = initialValue + (monthlyValue * i);
+  //         NormalDistribution normalDistribution = new NormalDistribution(periodizedMu * (i + 1),
+  //                 periodizedSigma * sqrt(i + 1));
+  //         double bounds[] = new double[breaks.length];
+  //         for (int j = 0; j < breaks.length; j++) {
+  //             double normInv = normalDistribution.inverseCumulativeProbability(breaks[j]);
+  //             bounds[j] = value * exp(normInv);
+  //         }
 
-          result.add(bounds);
-      }
-      return result;
-  }
+  //         result.add(bounds);
+  //     }
+  //     return result;
+  // }
 
   double timeDiffSec = 2;
   double mu = 0.1;
   double sigma = 0.1;
   double randInt = 0.0;
   Random one = new Random();
-  // get price of each stock from database and save as initial price for new brownian motion calculation:
-  double initialPriceS = 2000;
 
-  double getLatestBrownianPrice2(double initialPrice){
+        /**
+     * This method returns the next brownian motion price based on current price for a time delta of 2 seconds.
+     *
+     * @param initialPrice the current price of a stock
+     * @return the new stock price based on brownian motion
+     */
+  public double getLatestBrownianPrice2(double initialPrice){
       randInt = one.nextGaussian();
       double newPrice = initialPrice * (1 + (mu * (timeDiffSec/7257600) + sigma * randInt * Math.sqrt(timeDiffSec/7257600)));
       // System.out.println(newPrice);
@@ -213,13 +235,15 @@ for (List<String> record: records){
       return initialPrice;
   }
 
-
+        /**
+     * This method is scheduled to run every 2 seconds and fetches the latest brownian prices for each stock and updates it in database.
+     */
   @Scheduled(fixedRate = 2000L)
-  public void sendMessage() throws Exception{
+  public void sendMessage() throws DatabaseException{
     LocalTime myObj = LocalTime.now();
       // System.out.println(myObj);
     System.out.println("Market Update...");
-    double price = getLatestBrownianPrice2(initialPriceS);
+    // double price = getLatestBrownianPrice2(initialPriceS);
     List<Stock> stocks = stockService.getAccounts();
     for (Stock s: stocks){
       System.out.println("ssss:" + s.toString());

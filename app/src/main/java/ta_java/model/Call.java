@@ -10,6 +10,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+/**
+ * Call class that has a price associated with it
+ */
 // @Entity
 // @Data
 // @NoArgsConstructor
@@ -34,7 +38,7 @@ public class Call {
     this.price = price;
   }
 
-  public double getName(){
+  public double getPrice(){
     return this.price;
   }
 }

@@ -14,6 +14,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+/**
+ * Stock class with price, quantity and volatility attributes for its associated ticker.
+ */
 // @Entity
 // @Data
 // @NoArgsConstructor
