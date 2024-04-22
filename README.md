@@ -44,7 +44,7 @@ This calculation is done based on European Option Pricing Formula.
 - ImmutablePair Java type was used for storing results of option and its real time price. This is to allow for safer typing and with no list mutations involved, immutable types will be processed faster than mutable types. Immutable types also less memory intensive and better for processing large amounts of options. 
 - Error handling for stocks not found as shown below:
 
-![](./images/sampleRealTimeCalculation.png)
+![](./images/stockNotFoundErrorPage.png)
 
 ## Section 3: Java Documentation
 
@@ -52,7 +52,7 @@ This calculation is done based on European Option Pricing Formula.
 
 2. Codebase Documentation for app found at path "app/build/docs/javadoc"
 
-![](./images/sampleRealTimeCalculation.png)
+![](./images/javadoc_models.png)
 
 ## To Dos:
 - [x] Utilising Browninan motion to simulate market data changes
