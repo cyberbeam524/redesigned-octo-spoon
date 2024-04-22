@@ -64,4 +64,4 @@ This calculation is done based on European Option Pricing Formula.
 References:
 - https://medium.com/@albertoglvz25/brownian-motion-for-stock-market-prediction-in-python-aae5bb755e85#:~:text=The%20Geometric%20Brownian%20Motion%20(GBM,are%20random%20and%20normally%20distributed. for understanding brownian motion and its possible relation to certain price changes of financial assets
 
-[![Javadoc](https://img.shields.io/badge/JavaDoc-Online-green)](https://cyberbeam524.github.io/redesigned-octo-spoon/javadoc/)
+[![Javadoc](https://img.shields.io/badge/JavaDoc-Online-green)](https://cyberbeam524.github.io/redesigned-octo-spoon/)
