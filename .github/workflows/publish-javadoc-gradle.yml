@@ -18,7 +18,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           javadoc-branch: javadoc
           java-version: 17
-          folder: build
+          javadoc-source-folder: build
           target-folder: javadoc 
           project: gradle
-          custom-command: javadoc -d javadoc -sourcepath src/main/java/ta_java -subpackages .
+          # mkdir docs && cd docs & mkdir javadoc && cd .. 
+          # custom-command: javadoc -d javadoc -sourcepath src/main/java/ta_java -subpackages .
