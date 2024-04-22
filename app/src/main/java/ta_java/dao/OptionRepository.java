@@ -7,7 +7,9 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
 
-// ListCrudRepository<Employee, Long>,
+  /**
+ * Repository class for performing Option table database updates 
+ */
 @Repository
 public interface OptionRepository extends JpaRepository<Option, Long> {
 }

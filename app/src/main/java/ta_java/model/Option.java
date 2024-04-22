@@ -10,11 +10,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.stream.*; 
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 
@@ -26,7 +28,7 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 // @Data
 // @NoArgsConstructor
 @Entity
-@Table(name = "put")
+@Table(name = "option")
 @Data
 // @NoArgsConstructor
 @AllArgsConstructor
@@ -42,8 +44,8 @@ public class Option{
     Boolean callOption;
 
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "stock_id")
+    @ManyToOne
+    @JoinColumn(name = "stock_id", nullable=false)
     private Stock stock;
 
 
@@ -63,21 +65,19 @@ public class Option{
     this.stock = stock;
   }
 
-//   public Double getName(){
-//     return this.price;
-//   }
+  public Double getPrice(){
+    return this.price;
+  }
 
-//   public Double getTimeToMaturity(){
-//     return this.timeToMaturity;
-//   }
+  public Double getTimeToMaturity(){
+    return this.timeToMaturity;
+  }
 
-//   public Double getFixedStrikePrice(){
-//     return this.fixedStrikePrice;
-//   }
+  public Double getFixedStrikePrice(){
+    return this.fixedStrikePrice;
+  }
 
   public Double getRealTimeValue(){
-    
-
     double S = this.stock.getPrice();
     double K = this.fixedStrikePrice;
     double r = 0.02;
@@ -86,32 +86,14 @@ public class Option{
     NormalDistribution normdist = new NormalDistribution();
     double d1 = (java.lang.Math.log(S/K) + (r + (sigma_volatility * sigma_volatility / 2)) * t) / (sigma_volatility * Math.sqrt(t));
     double d2 = d1 - (sigma_volatility * Math.sqrt(t));
-    // if (this.callOption){
-    //   Double c = S * normdist.cumulativeProbability(d1) - K * Math.exp(-r * t) *normdist.cumulativeProbability(d2);
-    // }else{
-
-    // }
-    // String s = String.format("S:%s, S:%s,S:%s, S:%s, S:%s, S:%s,  ", Double.toString(S), 
-    // Double.toString(K), Double.toString(sigma_volatility), Double.toString(t), Double.toString(d1), Double.toString(d2));
-    // System.out.println(s);
-    //  Double.toString(sigma_volatility), Double.toString(t), Double.toString(d1), Double.toString(d2) );
     Double value = this.callOption ? S * normdist.cumulativeProbability(d1) - K * Math.exp(-r * t) *normdist.cumulativeProbability(d2) : 
     K * Math.exp(-r * t) * normdist.cumulativeProbability(-d2) - S * normdist.cumulativeProbability(-d1);
-    
-    // Double p = K * Math.exp(-r * t) * normdist.cumulativeProbability(-d2) - S * normdist.cumulativeProbability(-d1);
-
-    // HashMap<String, Double> response = new HashMap<>();
-    // response.put("Call", c);
-    // response.put("Put", p);
-    // response.put("Underlying Price", S);
-
     return value;
   }
 
   public String toString(){
-    return String.format("%s:%s[stock:%s]", this.price, Double.toString(this.price), this.stock);
+    return String.format("[stock:%s]%s - $%s", this.stock.getName(), this.callOption ? "Call" : "Put", this.price);
    }
-
 
 
 

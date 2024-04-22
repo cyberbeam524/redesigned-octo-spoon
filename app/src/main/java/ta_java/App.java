@@ -3,64 +3,6 @@
 //  */
 package ta_java;
 
-// import java.io.BufferedReader;
-// import java.io.File;
-// import java.io.FileReader;
-// import java.io.IOException;
-// import java.nio.file.Path;
-// import java.nio.file.Paths;
-// import java.util.ArrayList;
-// import java.util.Arrays;
-// import java.util.List;
-
-// public class App {
-//     public String getGreeting() {
-//         return "Hello World!";
-//     }
-
-    // public List<List<String>> readCsvFile(File file) throws IOException {
-    //     List<List<String>> records = new ArrayList<>();
-    //     try (BufferedReader br = new BufferedReader(new FileReader( file))) {
-    //         String line;
-    //         while ((line = br.readLine()) != null) {
-    //             String[] values = line.split(",");
-    //             records.add(Arrays.asList(values));
-    //         }
-    //     }
-
-    //     System.out.println(records);
-    //     return records;
-    // }
-
-//     public static void main(String[] args) throws IOException {
-//         System.out.println(new App().getGreeting());
-//         System.out.println("Working Directory = " + System.getProperty("user.dir"));
-//         Path currentRelativePath = Paths.get("");
-// String s = currentRelativePath.toAbsolutePath().toString();
-// System.out.println("Current absolute path is: " + s);
-
-
-// File folder = new File("../assets");
-// File[] listOfFiles = folder.listFiles();
-
-// for (int i = 0; i < listOfFiles.length; i++) {
-//   if (listOfFiles[i].isFile()) {
-//     System.out.println("File " + listOfFiles[i].getName());
-//     List<List<String>> records = new App().readCsvFile(listOfFiles[i]);
-//   } else if (listOfFiles[i].isDirectory()) {
-//     System.out.println("Directory " + listOfFiles[i].getName());
-//   }
-// }
-//         // new App().readCsvFile();
-        
-//     }
-
-// }
-
-
-
-// package com.howtodoinjava.demo;
-
 import ta_java.model.Option;
 import ta_java.model.Stock;
 import ta_java.service.OptionService;
@@ -88,14 +30,11 @@ import java.time.LocalTime;
 import java.util.*;
 import static java.lang.Math.sqrt;
 import static org.mockito.ArgumentMatchers.booleanThat;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
 import static java.lang.Math.exp;
-
 import java.util.stream.Collectors;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -125,6 +64,8 @@ public class App implements CommandLineRunner {
 
   // creating a logger 
   Logger logger = LoggerFactory.getLogger(App.class); 
+
+  int updateNum = 1;
   // logger
 
     /**
@@ -159,16 +100,22 @@ public class App implements CommandLineRunner {
  */
   public void createCallPutOptions(StockService stockService, OptionService optionService) throws DatabaseException{
     // readfile and create objects:
-    Stock s = stockService.create(new Stock("AAPL", 200, 200, 0.02));
+    Stock s = stockService.findByName("AAPL");
     System.out.println(s);
     Option callOption1 = optionService.create(new Option(50, 5, 30, s, true));
-    Option putOption1 = optionService.create(new Option(50, 5, 30, s, false));
+    Option putOption1 = optionService.create(new Option(60, 5, 30, s, false));
 
     System.out.println("For stock:" + s);
     System.out.println("For call option:" + callOption1);
     System.out.println("Real time value of call option: " + Double.toString(callOption1.getRealTimeValue()));
     System.out.println("For put option:" + putOption1);
     System.out.println("Real time value of put option: " + Double.toString(putOption1.getRealTimeValue()));
+
+    // simulating 2000 options created:
+    for (int i=  90; i < 2090; i++){
+      callOption1 = optionService.create(new Option(i, 5, 30, s, true));
+      putOption1 = optionService.create(new Option(i + 10, 5, 30, s, false));
+    }
 
   }
 
@@ -186,34 +133,8 @@ public class App implements CommandLineRunner {
       Stock s1 = stockService.create(new Stock(record.get(0), Double.parseDouble(record.get(2)), Double.parseDouble(record.get(1)), 0.02));
     }
     createCallPutOptions(stockService, optionService);
-    // precalculate all the prices for that day here orrrr: fix the start price and calculate all other future prices with diffenet time on scheduled message
+    // precalculate all the prices for that day here or: fix the start price and calculate all other future prices with diffenet time on scheduled message
   }
-
-
-  // public List<double[]> getLatestBrownianPrice(double mu, double sigma, int years, int initialValue,
-  // int monthlyValue, double[] breaks){
-
-
-  //     double periodizedMu = mu / 12;
-  //     double periodizedSigma = sigma / Math.sqrt(12);
-  //     int periods = years * 12;
-
-  //     List<double[]> result = new ArrayList<double[]>();
- 
-  //     for (int i = 0; i < periods; i++) {
-  //         double value = initialValue + (monthlyValue * i);
-  //         NormalDistribution normalDistribution = new NormalDistribution(periodizedMu * (i + 1),
-  //                 periodizedSigma * sqrt(i + 1));
-  //         double bounds[] = new double[breaks.length];
-  //         for (int j = 0; j < breaks.length; j++) {
-  //             double normInv = normalDistribution.inverseCumulativeProbability(breaks[j]);
-  //             bounds[j] = value * exp(normInv);
-  //         }
-
-  //         result.add(bounds);
-  //     }
-  //     return result;
-  // }
 
   double timeDiffSec = 2;
   double mu = 0.1;
@@ -227,10 +148,9 @@ public class App implements CommandLineRunner {
      * @param initialPrice the current price of a stock
      * @return the new stock price based on brownian motion
      */
-  public double getLatestBrownianPrice2(double initialPrice){
+  public double getLatestBrownianPrice(double initialPrice){
       randInt = one.nextGaussian();
       double newPrice = initialPrice * (1 + (mu * (timeDiffSec/7257600) + sigma * randInt * Math.sqrt(timeDiffSec/7257600)));
-      // System.out.println(newPrice);
       initialPrice = newPrice;
       return initialPrice;
   }
@@ -241,28 +161,18 @@ public class App implements CommandLineRunner {
   @Scheduled(fixedRate = 2000L)
   public void sendMessage() throws DatabaseException{
     LocalTime myObj = LocalTime.now();
-      // System.out.println(myObj);
-    System.out.println("Market Update...");
-    // double price = getLatestBrownianPrice2(initialPriceS);
+    System.out.println("## " + updateNum + " Market Data Update    [Created At:" + myObj + "]");
+    updateNum++;
     List<Stock> stocks = stockService.getAccounts();
-    for (Stock s: stocks){
-      System.out.println("ssss:" + s.toString());
-    }
-
-    List<Double> newPrices = stocks.stream().map(x -> getLatestBrownianPrice2(x.getPrice())).collect(Collectors.toList());
-    System.out.println("tttt:" + newPrices.toString());
-    
+    List<Double> newPrices = stocks.stream().map(x -> getLatestBrownianPrice(x.getPrice())).collect(Collectors.toList());
     List<Stock> newUpdatedStocks = new ArrayList<>();
     for (int i = 0; i < stocks.size(); i++) {
       Stock sUpdated = stocks.get(i);
       sUpdated.setPrice(newPrices.get(i));
       newUpdatedStocks.add(sUpdated);
     }
-
     stockService.updateMultiple(newUpdatedStocks);
-    // for each of the stocks in books.csv publish a new price (and add randomised controls on whether there are updates for stock:)
-    
-    
+    // for each of the stocks in stocks.csv publish a new price (and add randomised controls on whether there are updates for stock:)
   }
 
 }

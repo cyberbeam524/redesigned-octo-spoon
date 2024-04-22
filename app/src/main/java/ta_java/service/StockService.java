@@ -54,6 +54,15 @@ public class StockService implements ApplicationEventPublisherAware {
     throw new DatabaseException("newStock could not be saved");
   }
 
+    public Stock findByName(String stockName) throws DatabaseException {
+    Stock newStock = repository.findByName(stockName);
+    // if (newStock != null) {
+    //   return newStock;
+    // }
+    // throw new DatabaseException("Stock could not be found");
+    return newStock;
+  }
+
   // todo: stock service on update publish message for update stock event
   /**
  * @param stock Stock instance to be updated in database

@@ -1,6 +1,5 @@
 package ta_java.model;
 
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,10 +8,24 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.stream.*; 
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.stream.*; 
+
+import java.util.*; 
+
 
 
 /**
@@ -22,7 +35,7 @@ import lombok.NoArgsConstructor;
 // @Data
 // @NoArgsConstructor
 @Entity
-@Table(name = "stock")
+@Table(name = "stocks")
 @Data
 // @NoArgsConstructor
 @AllArgsConstructor
@@ -39,7 +52,8 @@ public class Stock {
   Double qty;
   Double volatility;
 
-
+  @OneToMany(mappedBy = "stock", cascade = CascadeType.REMOVE)
+  private List<Option> options;
 
   public Stock() {
     this.name = "null";
@@ -47,6 +61,7 @@ public class Stock {
     this.qty = 0.0;
     this.volatility = 0.0;
   }
+
 
   public Stock(String name, double price, double qty, double volatility) {
     this.name = name;
@@ -80,9 +95,20 @@ public class Stock {
     return this.volatility;
    }
 
+  public List<Option> getOptions(){
+    return options;
+    }
+
+   public Stream<Option> getOptionsStream(){
+    Stream.Builder<Option> optStreamBuilder = Stream.builder();
+    for (Option i: options) optStreamBuilder.accept(i);
+    return optStreamBuilder.build();
+   }
 
    public String toString(){
     return String.format("%s:%s", this.name, Double.toString(this.price));
    }
+
+  
 
 }
