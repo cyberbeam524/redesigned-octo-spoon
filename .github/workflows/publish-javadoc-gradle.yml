@@ -18,7 +18,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           javadoc-branch: javadoc
           java-version: 17
-          javadoc-source-folder: build
+          javadoc-source-folder: javadoc
           target-folder: javadoc 
           project: gradle
           # mkdir docs && cd docs & mkdir javadoc && cd .. 
