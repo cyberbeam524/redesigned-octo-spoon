@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"ta_java"},{"l":"ta_java.controllers"},{"l":"ta_java.dao"},{"l":"ta_java.events.stockManagement"},{"l":"ta_java.exception"},{"l":"ta_java.listeners"},{"l":"ta_java.model"},{"l":"ta_java.service"}];updateSearchResults();

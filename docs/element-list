@@ -1,0 +1,8 @@
+ta_java
+ta_java.controllers
+ta_java.dao
+ta_java.events.stockManagement
+ta_java.exception
+ta_java.listeners
+ta_java.model
+ta_java.service
