@@ -19,7 +19,7 @@ jobs:
           javadoc-branch: javadoc
           java-version: 17
           javadoc-source-folder: javadoc
-          target-folder: javadoc 
+          target-folder: docs 
           project: gradle
           # mkdir docs && cd docs & mkdir javadoc && cd .. 
           # custom-command: mkdir javadoc && javadoc -d javadoc -sourcepath src/main/java -subpackages .
