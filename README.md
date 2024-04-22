@@ -48,6 +48,8 @@ This calculation is done based on European Option Pricing Formula.
 
 ## Section 3: Java Documentation
 
+The official documentation for this repository has been published https://cyberbeam524.github.io/redesigned-octo-spoon/. For regenerating the documentation locally, do the following:
+
 1. Run ```./gradlew javadoc``` in terminal to start documentation generation.
 
 2. Codebase Documentation for app found at path "app/build/docs/javadoc"
