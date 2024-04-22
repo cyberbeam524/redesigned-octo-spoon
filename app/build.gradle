@@ -51,7 +51,7 @@ tasks.named('test') {
 }
 
 javadoc {
-    destinationDir = file("${buildDir}/javadoc")
+    destinationDir = file("${buildDir}")
 }
 // logging {
 // file ('build.log', LogLevel.DEBUG)
